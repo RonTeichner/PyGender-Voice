@@ -12,8 +12,11 @@ from sklearn import preprocessing
 import warnings
 warnings.filterwarnings("ignore")
 
-def get_MFCC(sr,audio):
-    features = mfcc.mfcc(audio,sr, 0.025, 0.01, 13,appendEnergy = False)
+n_components = 3
+n_MFCC = 7
+
+def get_MFCC(sr,audio,n_MFCC):
+    features = mfcc.mfcc(audio,sr, 0.025, 0.01, n_MFCC, appendEnergy = False)
     features = preprocessing.scale(features)
     return features
 
@@ -28,14 +31,14 @@ features = np.asarray(());
 
 for f in files:
     sr,audio = read(f)
-    vector   = get_MFCC(sr,audio)
+    vector   = get_MFCC(sr, audio, n_MFCC)
     if features.size == 0:
         features = vector
     else:
         features = np.vstack((features, vector))
 
-n_components = 2
-gmm = GaussianMixture(n_components = n_components, max_iter = 200, covariance_type='diag', n_init = 3)
+
+gmm = GaussianMixture(n_components=n_components, max_iter = 200, covariance_type='diag', n_init = 3)
 gmm.fit(features)
 picklefile = f.split("/")[-2].split(".wav")[0]+".gmm"
 
